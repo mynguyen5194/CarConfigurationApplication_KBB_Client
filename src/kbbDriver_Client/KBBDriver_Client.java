@@ -26,7 +26,7 @@ import client.*;
 public class KBBDriver_Client {
 	public static void main(String[] args) {
 		CreateClient newClient = new CreateClient();
-		System.out.println("done");
+//		System.out.println("done");
 		newClient.selectServiceOption();
 	}
 }

@@ -8,7 +8,7 @@ public class CreateClient {
 	Scanner scanner = new Scanner(System.in);
 
 	public CreateClient() {
-		clientSocket = new DefaultSocketClient("192.168.1.105", 4444);
+		clientSocket = new DefaultSocketClient("172.20.10.5", 4444);
 		clientSocket.openConnection();
 	}
 	
@@ -16,7 +16,7 @@ public class CreateClient {
 		System.out.printf("Enter your option: ");
 		String option = scanner.nextLine();
 		
-		switch(option.charAt(0)) {
+		switch(option.toUpperCase().charAt(0)) {
 		case 'U':
 			this.update();
 			break;
@@ -43,7 +43,6 @@ public class CreateClient {
 		
 		propertiesFileName = scanner.nextLine();
 			
-		
 		Properties pro = modelOptionsIO.readData(propertiesFileName);
 		clientSocket.sendPropertiesObj(pro);
 	}
