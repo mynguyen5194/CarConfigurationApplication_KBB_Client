@@ -131,9 +131,9 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 			Automobile auto = new Automobile(); 
 			auto = fileIO.parsePropertiesFile(pro);
 			
-			auto.printOptionSet();
+//			auto.printOptionSet();
 			
-			System.out.printf("Received\n");
+//			System.out.printf("Received\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

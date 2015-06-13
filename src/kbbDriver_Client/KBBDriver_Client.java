@@ -21,10 +21,9 @@
 
 package kbbDriver_Client;
 
-import adapter.*;
 import client.*;
 
-public class KBBDriver_Client extends BuildAuto {
+public class KBBDriver_Client {
 	public static void main(String[] args) {
 		CreateClient newClient = new CreateClient();
 		System.out.println("done");
