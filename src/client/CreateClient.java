@@ -2,10 +2,12 @@ package client;
 
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 public class CreateClient {
 	private DefaultSocketClient clientSocket;
-	Scanner scanner = new Scanner(System.in);
+	private ServerSocket serverSocket;
+	private Scanner scanner = new Scanner(System.in);
 
 	public CreateClient() {
 		clientSocket = new DefaultSocketClient("192.168.1.105", 4444);
@@ -13,22 +15,34 @@ public class CreateClient {
 	}
 	
 	public void selectServiceOption() {
-		System.out.printf("Enter your option: ");
-		String option = scanner.nextLine();
+		boolean quit = false;
 		
-		switch(option.toLowerCase()) {
-		case "update":
-			this.update();
-			break;
+		do {
+			System.out.printf("Enter your option: ");
+			String option = scanner.nextLine();
+			
+			switch(option.toLowerCase()) {
+			case "update":
+				this.update();
+				quit = false;
+				break;
 				
-		case "config":
-			this.config();
-			break;
+			case "display":
+				this.displayModel();
+				quit = false;
+				break;
 		
-		default:
-			System.out.printf("\nQuit\n");
-			break;
-		}		
+			case "quit":
+				System.out.printf("Quit\n");
+				quit = true;
+				break;
+				
+			default:
+				System.out.printf("Re-enter\n");
+				break;
+			}
+		} while(!quit);
+				
 	}
 	
 //	public void performOperation(String fileName) {
@@ -50,7 +64,8 @@ public class CreateClient {
 		clientSocket.sendPropertiesObj(pro);
 	}
 	
-	public void config() {
-		
+	public void displayModel() {
+		System.out.printf("\nDisplay Model function\n");
+		clientSocket.sendCommand("display");
 	}
 }

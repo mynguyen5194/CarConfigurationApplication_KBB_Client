@@ -3,6 +3,7 @@ package client;
 import java.net.*;
 import java.io.*;
 import java.util.*;
+
 import util.*;
 import model.*;
 
@@ -125,7 +126,22 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 			OutputStream output = socket.getOutputStream();
 			ObjectOutputStream objOutput = new ObjectOutputStream(output);
 			objOutput.writeObject(pro);
+			
+			FileIO fileIO = new FileIO();
+			Automobile auto = fileIO.parsePropertiesFile(pro);
+			
+			auto.printOptionSet();
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void sendCommand(String command) {
+		try {
+			OutputStream output = socket.getOutputStream();
+			ObjectOutputStream objOutput = new ObjectOutputStream(output);
+			objOutput.writeObject(command);
+		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
