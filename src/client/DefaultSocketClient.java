@@ -125,16 +125,6 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 			OutputStream output = socket.getOutputStream();
 			ObjectOutputStream objOutput = new ObjectOutputStream(output);
 			objOutput.writeObject(pro);
-			
-			FileIO fileIO = new FileIO();
-			
-			Automobile auto = new Automobile(); 
-			auto = fileIO.parsePropertiesFile(pro);
-			
-			
-//			auto.printOptionSet();
-			
-//			System.out.printf("Received\n");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
