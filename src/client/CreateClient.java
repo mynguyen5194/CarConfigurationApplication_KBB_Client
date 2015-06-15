@@ -8,11 +8,15 @@ public class CreateClient {
 	private DefaultSocketClient clientSocket;
 	private ServerSocket serverSocket;
 	private Scanner scanner = new Scanner(System.in);
+	private ObjectOutputStream output;
+	private ObjectInputStream input;
+	
 
 	public CreateClient() {
-		clientSocket = new DefaultSocketClient("192.168.1.105", 4444);
+		clientSocket = new DefaultSocketClient("10.41.209.172", 4444);
 		clientSocket.openConnection();
 	}
+	
 	
 	public void selectServiceOption() {
 		boolean quit = false;
@@ -23,8 +27,17 @@ public class CreateClient {
 			
 			switch(option.toLowerCase()) {
 			case "update":
-				this.update();
-				quit = false;
+				this.sendCommand("update");
+				System.out.println("command sent");
+				try {
+					if(((String) input.readObject()).equals("received")) {
+						this.update();
+						quit = false;
+					}
+				} catch (ClassNotFoundException | IOException e) {
+					e.printStackTrace();
+				}
+				
 				break;
 				
 			case "display":
@@ -45,12 +58,36 @@ public class CreateClient {
 				
 	}
 	
-//	public void performOperation(String fileName) {
-//		CarModelOptionsIO modelOptionsIO = new CarModelOptionsIO();
-//		
-//		Properties pro = modelOptionsIO.readData(fileName);
-//		clientSocket.sendPropertiesObj(pro);
-//	}
+	public void sendCommand(Object command) {
+		try {
+			output.writeObject(command);
+//			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public String readCommand() {
+		String command = "";
+		
+		command = ((String) this.getReponse());
+		
+		return command;
+	}
+	
+	public Object getReponse() {
+		Object response = null;
+		try {
+			response = input.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return response;
+	}
+
 	
 	public void update() {
 		CarModelOptionsIO modelOptionsIO = new CarModelOptionsIO();
@@ -61,11 +98,14 @@ public class CreateClient {
 		propertiesFileName = scanner.nextLine();
 			
 		Properties pro = modelOptionsIO.readData(propertiesFileName);
-		clientSocket.sendPropertiesObj(pro);
+		clientSocket.sendObject(pro);
 	}
 	
 	public void displayModel() {
 		System.out.printf("\nDisplay Model function\n");
-		clientSocket.sendCommand("display");
+		String command = "display";
+		Object display = command;
+		
+		clientSocket.sendObject(display);
 	}
 }

@@ -10,6 +10,7 @@ import model.*;
 public class DefaultSocketClient extends Thread implements SocketClientInterface, SocketClientConstants {
 	private ObjectInputStream reader;
 	private ObjectOutputStream writer;
+//	private ServerSocket serverSocket;
 	private Socket socket;
 	private String strHost;
 	private int iPort;
@@ -18,6 +19,7 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 	public DefaultSocketClient() {}
 	public DefaultSocketClient(Socket Socket) {
 		socket = Socket;
+		
 	}
 	public DefaultSocketClient(String StrHost, int IPort) {
 		strHost = StrHost;
@@ -71,6 +73,7 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 			socket = new Socket(strHost, iPort);
 		} catch (IOException socketError) {
 			if(DEBUG) {
+				System.out.println("\nCONNECT CONNECT\n");
 				System.err.printf("Unable to connect to " + strHost + "\n");
 			}
 			opened = false;
@@ -92,7 +95,6 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 	
 	public void handleSession() {
 		String strInput = "";
-		System.out.println("Running handle Session");
 		if(DEBUG) {
 			System.out.printf("Handling session with " + strHost + ": " + iPort);	
 		}
@@ -121,28 +123,34 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		System.out.printf(" " + strInput + " \n");
 	}
 	
-	public void sendPropertiesObj(Properties pro) {
+	public void sendObject(Object obj) {
 		try {
 			OutputStream output = socket.getOutputStream();
 			ObjectOutputStream objOutput = new ObjectOutputStream(output);
-			objOutput.writeObject(pro);
-			
-			FileIO fileIO = new FileIO();
-			Automobile auto = fileIO.parsePropertiesFile(pro);
-			
-			auto.printOptionSet();
+			objOutput.writeObject(obj);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 	
-	public void sendCommand(String command) {
+	public void receiveCommand() {
 		try {
-			OutputStream output = socket.getOutputStream();
-			ObjectOutputStream objOutput = new ObjectOutputStream(output);
-			objOutput.writeObject(command);
+			reader = new ObjectInputStream(socket.getInputStream());
 		} catch(IOException e) {
-			e.printStackTrace();
+			e.getStackTrace();
+		}
+		
+		try {
+			if(reader.readObject().toString().equals("display")) {
+				Fleet fleet = (Fleet) reader.readObject();
+				
+				fleet.printFleet();
+			}
+		} catch(IOException e) {
+			e.getStackTrace();
+		} catch (ClassNotFoundException err) {
+			err.printStackTrace();
 		}
 	}
 	
@@ -154,7 +162,5 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		} catch (IOException e) {
 			e.getMessage();
 		}
-	}
-	
-	
+	}	
 }
