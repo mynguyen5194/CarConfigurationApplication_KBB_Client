@@ -1,18 +1,12 @@
 package client;
 
 import java.util.*;
-import java.io.*;
 import java.net.*;
-
-import model.Fleet;
+import model.*;
 
 public class CreateClient {
 	private DefaultSocketClient clientSocket;
-	private ServerSocket serverSocket;
 	private Scanner scanner = new Scanner(System.in);
-	private ObjectOutputStream output;
-	private ObjectInputStream input;
-	
 
 	public CreateClient() {
 		try {
@@ -32,18 +26,23 @@ public class CreateClient {
 			String option = scanner.nextLine();
 			
 			switch(option.toLowerCase()) {
-			case "update":
-				this.update();
+			case "upload":
+				this.uploadPropertiesFile();
 				quit = false;				
 				break;
 				
+			case "config":
+				this.config();
+				quit = false;
+				break;
+				
 			case "display":
-				this.displayModel();
-				Object obj = readCommand();
-				System.out.println("Successful read");
-				Fleet f1 = (Fleet) obj;
-				f1.printFleet();
-				System.out.println("Successful display");
+				this.displayFleet();
+				quit = false;
+				break;
+				
+			case "menu":
+				this.displayMenu();
 				quit = false;
 				break;
 		
@@ -60,34 +59,7 @@ public class CreateClient {
 				
 	}
 	
-	public void sendCommand(Object command) {
-		try {
-			output.writeObject(command);
-			output.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public Object readCommand() {
-		return clientSocket.getObject();
-	}
-	
-	public Object getReponse() {
-		Object response = null;
-		try {
-			response = input.readObject();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return response;
-	}
-
-	
-	public void update() {
+	public void uploadPropertiesFile() {
 		CarModelOptionsIO modelOptionsIO = new CarModelOptionsIO();
 		
 		System.out.printf("Enter the properties file name: ");
@@ -95,15 +67,55 @@ public class CreateClient {
 		
 		propertiesFileName = scanner.nextLine();
 			
-		Properties pro = modelOptionsIO.readData(propertiesFileName);
-		clientSocket.sendObject(pro);
+		if(propertiesFileName.equals("")) {
+			System.out.printf("*** Empty properties file name ***\n");
+		}
+		else {
+			Properties pro = modelOptionsIO.readData(propertiesFileName);
+			if(pro == null) {
+				System.out.printf("*** Empty properties file ***\n");
+			}
+			else {
+				clientSocket.sendObject(pro);
+				
+				if(clientSocket.getObject().equals("success")) {
+					System.out.printf("*** Properties file uploaded successfully ***\n");
+				} else {
+					System.out.printf("*** Properties file uploaded fail ***\n");
+				}
+			}
+		}
 	}
 	
-	public void displayModel() {
-		System.out.printf("\nDisplay Model function\n");
-		String command = "display";
-		Object display = command;
+	public void config() {
+		System.out.printf("\t*** Automobile Configuration ***\n");
+	}
+	
+//	public void displayModel() {
+//		System.out.printf("Enter your wanted model: ");
+//		String modelName = scanner.nextLine();
+//		
+//		if(modelName.equals("")) {
+//			System.out.printf("Cannot send an empty model name\n");
+//		} else {
+//			clientSocket.sendObject(modelName);
+//		}
+//		
+//	}
+	
+	public void displayFleet() {
+		clientSocket.sendObject("display");
+		Object obj = clientSocket.getObject();
 		
-		clientSocket.sendObject(display);
+		Fleet fleet = (Fleet) obj;
+		fleet.printFleet();
+	}
+	
+	public void displayMenu() {
+		System.out.printf("\t*** Menu ***\n"
+				+ "  upload: upload properties file\n"
+				+ "  config: config a car\n"
+				+ "  display: display fleet\n"
+				+ "  menu: display menu\n");
 	}
 }

@@ -2,9 +2,6 @@ package client;
 
 import java.net.*;
 import java.io.*;
-import java.util.*;
-
-import model.*;
 
 public class DefaultSocketClient extends Thread implements SocketClientInterface, SocketClientConstants {
 	private ObjectInputStream reader;
@@ -12,7 +9,7 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 	private Socket socket;
 	private String strHost;
 	private int iPort;
-	private Scanner scanner = new Scanner(System.in);
+	
 	
 	public DefaultSocketClient() {}
 	public DefaultSocketClient(Socket Socket) {
@@ -62,7 +59,6 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		
 		try {
 			socket = new Socket(strHost, iPort);
-			System.out.println("created socket client");
 		} catch (IOException socketError) {
 			if(DEBUG) {
 				System.err.printf("Unable to connect to " + strHost + "\n");
@@ -102,6 +98,14 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		}
 	}
 	
+	public void sendObject(Object obj) {
+		try {
+			writer.writeObject(obj);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public Object getObject() {
 		Object receivedObj = null;
 		try {
@@ -111,71 +115,11 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		}
 		return receivedObj;
 	}
+	
 
-	public boolean uploadPropertiesFile() {
-		CarModelOptionsIO modelOptions = new CarModelOptionsIO();
-		boolean updated = false;
-		Properties pro = null;
-		
-		System.out.printf("\nEnter the properties file name: ");
-		String fileName = scanner.nextLine();
-		
-		if(fileName.equals("")) {
-			updated = false;
-		} else {
-			pro = modelOptions.readData(fileName);
-			updated = true;
-		}
-		
-		
-		
-		return updated;
-	}
-	
-	
-	public void setCommand(String command) {
-		try {
-			writer.writeObject(command);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void sendOutput(String strOutput) {
-		try {
-			writer.writeObject(strOutput);
-		} catch(IOException e) {
-			if(DEBUG) {
-				System.out.printf("Error writing to " + strHost + "\n");
-			}
-		}
-	}
 	
 	public void handleInput(String strInput) {
 		System.out.printf(" " + strInput + " \n");
-	}
-	
-	public void sendObject(Object obj) {
-		try {
-			writer.writeObject(obj);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void receiveCommand() {
-		
-		try {
-			if(reader.readObject().toString().equals("display")) {
-				Fleet fleet = (Fleet) reader.readObject();
-				
-				fleet.printFleet();
-			}
-		} catch(IOException e) {
-			e.getStackTrace();
-		} catch (ClassNotFoundException err) {
-			err.printStackTrace();
-		}
 	}
 	
 	public void closeSession() {
