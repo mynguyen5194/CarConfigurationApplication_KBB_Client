@@ -5,9 +5,10 @@
 
 package model;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Fleet {
+public class Fleet implements Serializable {
 	private LinkedHashMap<String, Automobile> fleet;	// String (key) = model
 	
 	

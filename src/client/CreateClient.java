@@ -4,6 +4,8 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
+import model.Fleet;
+
 public class CreateClient {
 	private DefaultSocketClient clientSocket;
 	private ServerSocket serverSocket;
@@ -13,7 +15,11 @@ public class CreateClient {
 	
 
 	public CreateClient() {
-		clientSocket = new DefaultSocketClient("10.41.209.172", 4444);
+		try {
+			clientSocket = new DefaultSocketClient(Inet4Address.getLocalHost().getHostAddress(), 4444);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
 		clientSocket.openConnection();
 	}
 	
@@ -27,21 +33,17 @@ public class CreateClient {
 			
 			switch(option.toLowerCase()) {
 			case "update":
-				this.sendCommand("update");
-				System.out.println("command sent");
-				try {
-					if(((String) input.readObject()).equals("received")) {
-						this.update();
-						quit = false;
-					}
-				} catch (ClassNotFoundException | IOException e) {
-					e.printStackTrace();
-				}
-				
+				this.update();
+				quit = false;				
 				break;
 				
 			case "display":
 				this.displayModel();
+				Object obj = readCommand();
+				System.out.println("Successful read");
+				Fleet f1 = (Fleet) obj;
+				f1.printFleet();
+				System.out.println("Successful display");
 				quit = false;
 				break;
 		
@@ -54,25 +56,21 @@ public class CreateClient {
 				System.out.printf("Re-enter\n");
 				break;
 			}
-		} while(!quit);
+		} while(true && !quit);
 				
 	}
 	
 	public void sendCommand(Object command) {
 		try {
 			output.writeObject(command);
-//			output.flush();
+			output.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public String readCommand() {
-		String command = "";
-		
-		command = ((String) this.getReponse());
-		
-		return command;
+	public Object readCommand() {
+		return clientSocket.getObject();
 	}
 	
 	public Object getReponse() {

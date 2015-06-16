@@ -4,22 +4,19 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 
-import util.*;
 import model.*;
 
 public class DefaultSocketClient extends Thread implements SocketClientInterface, SocketClientConstants {
 	private ObjectInputStream reader;
 	private ObjectOutputStream writer;
-//	private ServerSocket serverSocket;
 	private Socket socket;
 	private String strHost;
 	private int iPort;
-	
+	private Scanner scanner = new Scanner(System.in);
 	
 	public DefaultSocketClient() {}
 	public DefaultSocketClient(Socket Socket) {
 		socket = Socket;
-		
 	}
 	public DefaultSocketClient(String StrHost, int IPort) {
 		strHost = StrHost;
@@ -27,12 +24,6 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 	}
 	
 	
-	public ObjectInputStream getReader() {
-		return reader;
-	}
-	public ObjectOutputStream getWriter() {
-		return writer;
-	}
 	public Socket getSocket() {
 		return socket;
 	}
@@ -71,9 +62,9 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		
 		try {
 			socket = new Socket(strHost, iPort);
+			System.out.println("created socket client");
 		} catch (IOException socketError) {
 			if(DEBUG) {
-				System.out.println("\nCONNECT CONNECT\n");
 				System.err.printf("Unable to connect to " + strHost + "\n");
 			}
 			opened = false;
@@ -81,7 +72,7 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 		
 		try {
 			writer = new ObjectOutputStream(socket.getOutputStream());
-			reader = new ObjectInputStream(socket.getInputStream());			
+			reader = new ObjectInputStream(socket.getInputStream());
 		} catch(IOException e) {
 			if(DEBUG) {
 				e.printStackTrace();
@@ -99,13 +90,54 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 			System.out.printf("Handling session with " + strHost + ": " + iPort);	
 		}
 		try {
-			while((strInput = reader.readLine()) != null) {
+			while((strInput = (String) reader.readObject()) != null) {
 				handleInput(strInput);
 			}
 		} catch(IOException e) {
 			if(DEBUG) {
 				System.out.printf("Handling session with " + strHost + ": " + iPort);
 			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Object getObject() {
+		Object receivedObj = null;
+		try {
+			receivedObj = reader.readObject();
+		} catch (ClassNotFoundException | IOException e) {
+			e.printStackTrace();
+		}
+		return receivedObj;
+	}
+
+	public boolean uploadPropertiesFile() {
+		CarModelOptionsIO modelOptions = new CarModelOptionsIO();
+		boolean updated = false;
+		Properties pro = null;
+		
+		System.out.printf("\nEnter the properties file name: ");
+		String fileName = scanner.nextLine();
+		
+		if(fileName.equals("")) {
+			updated = false;
+		} else {
+			pro = modelOptions.readData(fileName);
+			updated = true;
+		}
+		
+		
+		
+		return updated;
+	}
+	
+	
+	public void setCommand(String command) {
+		try {
+			writer.writeObject(command);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -125,21 +157,13 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 	
 	public void sendObject(Object obj) {
 		try {
-			OutputStream output = socket.getOutputStream();
-			ObjectOutputStream objOutput = new ObjectOutputStream(output);
-			objOutput.writeObject(obj);
+			writer.writeObject(obj);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 	
 	public void receiveCommand() {
-		try {
-			reader = new ObjectInputStream(socket.getInputStream());
-		} catch(IOException e) {
-			e.getStackTrace();
-		}
 		
 		try {
 			if(reader.readObject().toString().equals("display")) {
