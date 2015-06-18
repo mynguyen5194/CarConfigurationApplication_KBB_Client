@@ -72,12 +72,12 @@ public class CreateClient {
 		
 			
 		if(!propertiesFile.exists()) {
-			System.out.printf("*** This properties file does not exit***\n");
+			System.out.printf("  *** Properties file does not exit***\n");
 		}
 		else {
 			Properties pro = modelOptionsIO.readData(propertiesFileName);
 			if(pro == null) {
-				System.out.printf("*** Empty properties file ***\n");
+				System.out.printf("  *** Empty properties file ***\n");
 			}
 			else {
 				clientSocket.sendObject(pro);
