@@ -102,7 +102,9 @@ public class CreateClient {
 		System.out.printf("Enter the option name: ");
 		String name = scanner.nextLine();
 		
-		clientSocket.sendObject(model);
+		String userChoice = model + "," + optName + "," + name; 
+		
+		clientSocket.sendObject(userChoice);
 		
 	}
 	
