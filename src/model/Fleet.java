@@ -141,16 +141,6 @@ public class Fleet implements Serializable {
 		return contains;
 	}
 	
-//	public boolean containsOption(String Model, String optName, String name) {
-//		boolean contains = false;
-//		
-//		if(this.containsKey(Model)) {
-//			
-//		}
-//		
-//		
-//		return contains;
-//	}
 	
 	// Print
 	// Print the whole fleet

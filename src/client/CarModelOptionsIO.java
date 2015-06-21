@@ -1,6 +1,6 @@
 package client;
 
-import java.util.*;
+import java.util.Properties;
 import java.io.*;
 
 public class CarModelOptionsIO {

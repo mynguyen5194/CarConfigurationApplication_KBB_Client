@@ -343,6 +343,10 @@ public class Automobile implements Serializable{
 		return found;
 	}
 	
+	public boolean containsOptionName(String optName) {
+		return optionSet.contains(optName);
+	}
+	
 	// UPDATE
 	// Update new optionSet
 	public boolean updateOptionSet(int index, OptionSet optSet) {
