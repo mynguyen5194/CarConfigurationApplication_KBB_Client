@@ -6,13 +6,17 @@ import java.net.*;
 
 import model.*;
 
-public class CreateClient {
+public class CreateClient{
 	private DefaultSocketClient clientSocket;
-	private Scanner scanner = new Scanner(System.in);
+	private SelectCarOption carOption;
+	private Scanner scanner;
 
 	public CreateClient() {
+		carOption = new SelectCarOption();
+		scanner = new Scanner(System.in);
 		try {
 			clientSocket = new DefaultSocketClient(Inet4Address.getLocalHost().getHostAddress(), 4444);
+			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -43,6 +47,11 @@ public class CreateClient {
 				quit = false;
 				break;
 				
+			case "display model":
+				this.displayModel();
+				quit = false;
+				break;
+				
 			case "menu":
 				this.displayMenu();
 				quit = false;
@@ -57,8 +66,7 @@ public class CreateClient {
 				System.out.printf("Re-enter\n");
 				break;
 			}
-		} while(true && !quit);
-				
+		} while(true && !quit);			
 	}
 	
 	public void uploadPropertiesFile() {
@@ -92,52 +100,28 @@ public class CreateClient {
 	}
 	
 	public void config() {
-		System.out.printf("\t*** Automobile Configuration ***\n");
-//		clientSocket.sendObject("config");
+		clientSocket.sendObject("config");
 		
-		System.out.printf("Enter the model name: ");
-		String model = scanner.nextLine();
-		System.out.printf("Enter the option set name: ");
-		String optName = scanner.nextLine();
-		System.out.printf("Enter the option name: ");
-		String name = scanner.nextLine();
-		
-		String userChoice = model + "," + optName + "," + name; 
-		
-		clientSocket.sendObject(userChoice);
-		
+		if(clientSocket.getObject().equals("start configuring")) {
+			Fleet fleet = (Fleet) clientSocket.getObject();
+			
+			carOption.config(scanner, fleet);
+		} else {
+			System.out.printf("Cannot connect to the server!\n");
+		}
 	}
 	
-//	public void displayModel() {
-//		System.out.printf("Enter your wanted model: ");
-//		String modelName = scanner.nextLine();
-//		
-//		if(modelName.equals("")) {
-//			System.out.printf("Cannot send an empty model name\n");
-//		} else {
-//			clientSocket.sendObject(modelName);
-//		}
-//		
-//	}
+	public void displayModel() {
+		carOption.displayModel(scanner, clientSocket);
+	}
 	
-	public void displayFleet() {
-		clientSocket.sendObject("display");
-		Object obj = clientSocket.getObject();
-		
-		Fleet fleet = (Fleet) obj;
-		fleet.printFleet();
+	public void displayFleet() {		
+		carOption.getAvailableModel(clientSocket);
 	}
 		
 	public void quit() {
-		
 		clientSocket.sendObject("quit");
-		
-		if(clientSocket.getObject().equals("terminated")) {
-			System.out.printf("Server terminated\n"
-					+ "Quit\n");
-		} else {
-			System.out.printf("Server cannot terminate\n");
-		}
+		clientSocket.closeSession();
 	}
 	
 	public void displayMenu() {
@@ -145,6 +129,7 @@ public class CreateClient {
 				+ "  upload: upload properties file\n"
 				+ "  config: config a car\n"
 				+ "  display: display fleet\n"
+				+ "  display model: display a specific model\n"
 				+ "  menu: display menu\n");
 	}
 

@@ -519,7 +519,8 @@ public class Automobile implements Serializable{
 		Iterator<String> it = set.iterator();
 		
 		System.out.printf("\t***Chosen Option***\n"
-				+ "Model: " + this.model + "\n");
+				+ "Model: " + this.model + "\n"
+				+ "   Base Price\t" + this.getBasePrice() + "\n");
 		
 		while(it.hasNext()) {
 			String key = it.next();

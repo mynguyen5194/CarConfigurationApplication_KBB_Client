@@ -9,6 +9,10 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Fleet implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3349639884774803966L;
 	private LinkedHashMap<String, Automobile> fleet;	// String (key) = model
 	
 	
@@ -136,6 +140,17 @@ public class Fleet implements Serializable {
 		
 		return contains;
 	}
+	
+//	public boolean containsOption(String Model, String optName, String name) {
+//		boolean contains = false;
+//		
+//		if(this.containsKey(Model)) {
+//			
+//		}
+//		
+//		
+//		return contains;
+//	}
 	
 	// Print
 	// Print the whole fleet

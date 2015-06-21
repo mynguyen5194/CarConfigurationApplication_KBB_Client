@@ -124,9 +124,12 @@ public class DefaultSocketClient extends Thread implements SocketClientInterface
 	
 	public void closeSession() {
 		try {
+			writer.close();
+			reader.close();
+			socket.close();
 			writer = null;
 			reader = null;
-			socket.close();
+			
 		} catch (IOException e) {
 			e.getMessage();
 		}
